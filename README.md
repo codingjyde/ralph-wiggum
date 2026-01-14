@@ -174,7 +174,7 @@ codex --login
 -p, --prompt-file FILE  Read prompt from file
 -s, --spec NAME         Run for specific spec in specs/
 -a, --all               Run for all specs in order
--f, --full-auto         Run without confirmations
+-f, --full-auto         YOLO mode: bypass all approvals and sandbox
 -q, --quiet             Suppress output except errors
 ```
 

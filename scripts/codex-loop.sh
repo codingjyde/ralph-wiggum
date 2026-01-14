@@ -93,7 +93,8 @@ Options:
     -p, --prompt-file FILE  Read prompt from file
     -s, --spec NAME         Run for a specific spec in specs/ folder
     -a, --all               Run for all specs in order
-    -f, --full-auto         Run in full-auto mode (no confirmations)
+    -f, --full-auto         YOLO mode: bypass ALL approvals and sandbox
+                            (uses --dangerously-bypass-approvals-and-sandbox)
     -q, --quiet             Suppress output except errors
     --max-iterations NUM    Maximum iterations (default: 30)
 
@@ -178,8 +179,9 @@ run_codex() {
     local prompt="$1"
     local args=""
     
+    # YOLO mode: bypass all approvals and sandbox restrictions
     if [[ "$FULL_AUTO" == "true" ]]; then
-        args="$args --full-auto"
+        args="$args --dangerously-bypass-approvals-and-sandbox"
     fi
     
     if [[ "$QUIET" == "true" ]]; then
@@ -187,7 +189,7 @@ run_codex() {
     fi
     
     log_status "LOOP" "Starting Codex with prompt..."
-    log_status "INFO" "Mode: $([ "$FULL_AUTO" == "true" ] && echo "full-auto" || echo "interactive")"
+    log_status "INFO" "Mode: $([ "$FULL_AUTO" == "true" ] && echo "YOLO (full autonomy)" || echo "interactive")"
     
     update_status "running" "Codex loop started"
     
