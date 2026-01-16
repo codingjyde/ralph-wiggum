@@ -1,58 +1,63 @@
-# Ralph Planning Mode
+# Ralph Planning Mode (OPTIONAL)
 
-Based on Geoffrey Huntley's Ralph Wiggum methodology.
-https://github.com/ghuntley/how-to-ralph-wiggum
+> ⚠️ **This mode is OPTIONAL.** Most projects work fine directly from specs.
+>
+> Only use this when you want a detailed breakdown of large specs into smaller tasks.
+>
+> **Preferred workflow:** Just run `./scripts/ralph-loop.sh` — it works directly from specs.
+
+---
+
+## When to Use Planning Mode
+
+Use this ONLY if:
+- You have very large specs that need breakdown into subtasks
+- You want a detailed task list beyond what specs provide
+- You're combining multiple specs into a prioritized backlog
+
+**If your specs are already well-defined, skip this and run build mode directly.**
 
 ---
 
 ## Phase 0: Orient
 
-0a. Study `specs/*` to learn the application specifications. Each spec defines requirements for a feature.
+0a. Read `.specify/memory/constitution.md` for project principles.
 
-0b. Study @IMPLEMENTATION_PLAN.md (if present) to understand the plan so far.
-
-0c. Study `.specify/memory/constitution.md` for project principles and configuration (if present).
-
-0d. For reference, the application source code is in `src/*`.
+0b. Study `specs/` to learn all feature specifications.
 
 ---
 
-## Phase 1: Gap Analysis & Planning
+## Phase 1: Gap Analysis
 
-1. Study @IMPLEMENTATION_PLAN.md (if present; it may be incorrect) and study existing source code in `src/*` and compare it against `specs/*`. 
-
-   Analyze findings, prioritize tasks, and create/update @IMPLEMENTATION_PLAN.md as a bullet point list sorted in priority of items yet to be implemented.
-
-   Consider:
-   - TODOs in code
-   - Minimal implementations or placeholders
-   - Skipped or flaky tests
-   - Inconsistent patterns
-   - Missing features from specs
-   - Acceptance criteria not yet met
-
-   Keep @IMPLEMENTATION_PLAN.md up to date with items considered complete/incomplete.
+Compare specs against current codebase:
+- What's fully implemented?
+- What's partially done?
+- What's not started?
 
 ---
 
-## Rules
+## Phase 2: Create Plan (if needed)
 
-IMPORTANT: Plan only. Do NOT implement anything.
+Create `IMPLEMENTATION_PLAN.md` with a prioritized task list:
 
-Do NOT assume functionality is missing; confirm with code search first.
+```markdown
+# Implementation Plan
+
+> Optional breakdown of specs into smaller tasks.
+> Delete this file to return to working directly from specs.
+
+## Tasks
+
+- [ ] [HIGH] Task description - from spec NNN
+- [ ] [MEDIUM] Task description - from spec NNN
+
+## Completed
+
+- [x] Completed task
+```
 
 ---
 
-## Ultimate Goal
+## Completion Signal
 
-Analyze all specifications in `specs/` and create a comprehensive, prioritized implementation plan.
-
-If an element is missing, search first to confirm it doesn't exist, then if needed author the specification.
-
-If you create a new element then document the plan to implement it in @IMPLEMENTATION_PLAN.md.
-
----
-
-## Completion
-
-When planning is complete, output: `<promise>DONE</promise>`
+When done: `<promise>DONE</promise>`
