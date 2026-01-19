@@ -204,16 +204,23 @@ Build exactly what's needed, nothing more.
 
 ## Work Items
 
-**Source:** `specs/` folder
+The agent discovers work dynamically from:
+1. **specs/ folder** — Primary source, look for incomplete `.md` files
+2. **GitHub Issues** — If this is a GitHub repo
+3. **IMPLEMENTATION_PLAN.md** — If it exists
+4. **Any task tracker** — Jira, Linear, etc. if configured
 
-Create specs using:
-- `/speckit.specify [description]` in Cursor
-- Or manually create `specs/NNN-feature-name.md`
+Create specs using `/speckit.specify [description]` or manually create `specs/NNN-feature-name.md`.
 
-Each spec MUST have testable acceptance criteria and end with:
-```
-**Output when complete:** `<promise>DONE</promise>`
-```
+Each spec MUST have **testable acceptance criteria**.
+
+### Re-Verification Mode
+
+When all specs appear complete, the agent will:
+1. Randomly pick a completed spec
+2. Strictly re-verify ALL acceptance criteria
+3. Fix any regressions found
+4. Only output `<promise>DONE</promise>` if quality confirmed
 
 ---
 

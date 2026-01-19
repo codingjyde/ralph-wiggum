@@ -263,26 +263,42 @@ Based on Geoffrey Huntley's Ralph Wiggum methodology.
 
 ## Phase 0: Orient
 
-0a. Read `.specify/memory/constitution.md` for project principles.
-
-0b. Study `specs/` to understand feature specifications.
-
-0c. Check if `IMPLEMENTATION_PLAN.md` exists.
+Read `.specify/memory/constitution.md` to understand project principles and constraints.
 
 ---
 
-## Phase 1: Select Work Item
+## Phase 1: Discover Work Items
 
-### If IMPLEMENTATION_PLAN.md exists:
-Pick the **HIGHEST PRIORITY** incomplete task from the plan.
+Search for incomplete work from these sources (in order):
 
-### If NO plan exists (preferred simple approach):
-Look at `specs/` folder and pick the **HIGHEST PRIORITY** spec that:
-- Is NOT marked as complete (no `[x] DONE` or similar in the spec)
-- Has incomplete acceptance criteria
-- Has the highest priority (lower number = higher priority, e.g., 001 before 010)
+1. **specs/ folder** — Look for `.md` files NOT marked `## Status: COMPLETE`
+2. **IMPLEMENTATION_PLAN.md** — If exists, find unchecked `- [ ]` tasks
+3. **GitHub Issues** — Check for open issues (if this is a GitHub repo)
+4. **Any task tracker** — Jira, Linear, etc. if configured
 
-Before implementing, search the codebase — don't assume it's not done.
+Pick the **HIGHEST PRIORITY** incomplete item:
+- Lower numbers = higher priority (001 before 010)
+- `[HIGH]` before `[MEDIUM]` before `[LOW]`
+- Bugs/blockers before features
+
+Before implementing, search the codebase to verify it's not already done.
+
+---
+
+## Phase 1b: Re-Verification Mode (No Incomplete Work Found)
+
+**If ALL specs appear complete**, don't just exit — do a quality check:
+
+1. **Randomly pick** one completed spec from `specs/`
+2. **Strictly re-verify** ALL its acceptance criteria:
+   - Run the actual tests mentioned in the spec
+   - Manually verify each criterion is truly met
+   - Check edge cases
+   - Look for regressions
+3. **If any criterion fails**: Unmark the spec as complete and fix it
+4. **If all pass**: Output `<promise>DONE</promise>` to confirm quality
+
+This ensures the codebase stays healthy even when "nothing to do."
 
 ---
 
@@ -292,7 +308,6 @@ Implement the selected spec/task completely:
 - Follow the spec's requirements exactly
 - Write clean, maintainable code
 - Add tests as needed
-- Mark the spec as complete when done
 
 ---
 
@@ -307,17 +322,16 @@ Run the project's test suite and verify:
 
 ## Phase 4: Commit & Update
 
-1. If using IMPLEMENTATION_PLAN.md, update it to mark task complete
-2. If working directly from specs, add `## Status: COMPLETE` to the spec file
-3. `git add -A`
-4. `git commit` with a descriptive message
-5. `git push`
+1. Mark the spec/task as complete (add `## Status: COMPLETE` to spec file)
+2. `git add -A`
+3. `git commit` with a descriptive message
+4. `git push`
 
 ---
 
 ## Completion Signal
 
-**CRITICAL:** Only output the magic phrase when the spec/task is 100% complete.
+**CRITICAL:** Only output the magic phrase when the work is 100% complete.
 
 Check:
 - [ ] Implementation matches all requirements
