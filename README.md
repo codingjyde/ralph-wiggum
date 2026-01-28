@@ -177,6 +177,50 @@ Every loop run writes **all output** to log files in `logs/`:
 
 If something gets stuck, these logs contain the full verbose trace.
 
+### NR_OF_TRIES Tracking
+
+Each spec tracks how many times it has been attempted. After 10 attempts without completion, the spec is flagged as "stuck" and should be split into smaller specs.
+
+```bash
+# Check stuck specs
+source scripts/lib/nr_of_tries.sh
+print_stuck_specs_summary
+```
+
+The counter is stored as a comment in the spec file:
+```markdown
+<!-- NR_OF_TRIES: 5 -->
+```
+
+### Telegram Notifications (Optional)
+
+Get progress updates via Telegram! See [TELEGRAM_SETUP.md](TELEGRAM_SETUP.md) for setup.
+
+```bash
+# Enable telegram (requires TG_BOT_TOKEN and TG_CHAT_ID)
+./scripts/ralph-loop.sh
+
+# Enable audio notifications (also requires CHUTES_API_KEY)
+./scripts/ralph-loop.sh --telegram-audio
+
+# Disable telegram
+./scripts/ralph-loop.sh --no-telegram
+```
+
+**What you'll get:**
+- 🚀 Loop start notifications
+- ✅ Spec completion notifications with mermaid diagrams
+- ⚠️ Warnings for consecutive failures or stuck specs
+- 🏁 Summary when loop finishes
+
+### Completion Logs
+
+On each spec completion, entries are created in `completion_log/`:
+- `YYYY-MM-DD--HH-MM-SS--spec-name.md` — Summary and mermaid code
+- `YYYY-MM-DD--HH-MM-SS--spec-name.png` — Rendered mermaid diagram
+
+These provide a visual history of what was built.
+
 ### RLM Mode (Experimental)
 
 For huge inputs, you can run in **RLM-style mode** by providing a large context file.
