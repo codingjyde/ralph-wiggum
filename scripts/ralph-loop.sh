@@ -338,83 +338,101 @@ EOF
 fi
 
 cat >> "PROMPT_build.md" << 'BUILDEOF'
+## Deterministic State Machine (Mandatory)
 
-## Phase 1: Discover Work Items
+You are building a deterministic, enterprise-grade Spec-Driven Autonomous Loop.
 
-Search for incomplete work from these sources (in order):
+No improvisation.
+No stack drift.
+No speculative scaffolding.
+No implicit assumptions.
+Stop until it is done.
 
-1. **specs/ folder** — Look for `.md` files NOT marked `## Status: COMPLETE`
-2. **IMPLEMENTATION_PLAN.md** — If exists, find unchecked `- [ ]` tasks
-3. **GitHub Issues** — Check for open issues (if this is a GitHub repo)
-4. **Any task tracker** — Jira, Linear, etc. if configured
+Execution states (strictly linear):
+1. `STATE 1: DOMAIN_REQUIRED`
+2. `STATE 2: SPEC_VALIDATION`
+3. `STATE 3: MATRIX_GENERATION`
+4. `STATE 4: TASK_PLANNING`
+5. `STATE 5: TASK_EXECUTION`
+6. `STATE 6: SAFETY_GATE_VALIDATION`
+7. `STATE 7: COMMIT`
+8. `STATE 8: STOPPED`
 
-Pick the **HIGHEST PRIORITY** incomplete item:
-- Lower numbers = higher priority (001 before 010)
-- `[HIGH]` before `[MEDIUM]` before `[LOW]`
-- Bugs/blockers before features
+If any state fails:
+- Insert prerequisite task directly above current task, mark it `PREREQUISITE`
+- Commit only prerequisite work
+- Stop execution and enter `STATE 8: STOPPED`
+- Do not continue original task
 
-Before implementing, search the codebase to verify it's not already done.
+## Mandatory Domain Input
 
----
+Before any scaffolding:
+- Prompt for real root domain (never `example.com`)
+- Prompt for required subdomains
+- Require explicit confirmation
 
-## Phase 1b: Re-Verification Mode (No Incomplete Work Found)
+If missing:
+- Insert prerequisite
+- Commit it
+- Stop until it is done
 
-**If ALL specs appear complete**, don't just exit — do a quality check:
+## Mandatory Rules
 
-1. **Randomly pick** one completed spec from `specs/`
-2. **Strictly re-verify** ALL its acceptance criteria:
-   - Run the actual tests mentioned in the spec
-   - Manually verify each criterion is truly met
-   - Check edge cases
-   - Look for regressions
-3. **If any criterion fails**: Unmark the spec as complete and fix it
-4. **If all pass**: Output `<promise>DONE</promise>` to confirm quality
+- Target app root must contain only `./docs` and `./code`
+- Specs live in `./docs/specs` with: version, objectives, constraints, contracts, events, acceptance tests, Service Matrix, Client Matrix, Technology Matrix
+- Persisted dates must be epoch milliseconds via `Date.now()`
+- Folder-based modules only; 4 spaces in `.js` and `.vue`
+- Shared code in `./src/_common`; constants in `./src/_common/constants` as `Object.freeze` enums
+- Mode enum must exist at `./src/_common/constants/mode/index.js`
+- Runtime services must start conditionally by MODE (`ALL`, `WEB`, `REALTIME`, `WORKER`)
+- Backend lock: Express/CommonJS/async-await, socket.io, FreeSWITCH, agenda.js, MongoDB/Mongoose, winston JSON logging, no `console.log` outside tests
+- Mongoose models: string `_id`, `_id` auto disabled, epoch `createdAt`/`updatedAt`, `isDeleted`, `scopeMode`
+- Organisation-scoped queries must include `organisationId`
+- Soft delete enforcement required: `{ isDeleted: false }`
+- Pagination required on list endpoints: cursor+size and page+size, default 25, max 100, stable sort, cursor preferred
+- Client lock: Quasar + Vue3 + Vuex + Options API + history mode + Netlify `_redirects`; no React/Pinia/Composition API/TypeScript unless spec explicitly requires
+- Vue component order must match mandated order exactly
 
-This ensures the codebase stays healthy even when "nothing to do."
+## Safety Gate (Before Commit)
 
----
+Abort commit and enter `STATE 8: STOPPED` if any fail:
+- Diff too large
+- `console.log` outside tests
+- Spec changed without version bump
+- Tests not executed
+- Secrets in logs
+- Missing organisationId for organisation scope
+- Missing soft delete enforcement
+- `_id` not string
+- Non-epoch date persistence
+- Missing pagination dual support
+- Mode not imported from `_common/constants`
+- Unconditional service startup
+- Wrong indentation
+- Missing Quasar `_redirects`
+- Router not history mode
+- Vue component order incorrect
+- Constant enum outside `_common/constants`
 
-## Phase 2: Implement
+## Execution Contract
 
-Implement the selected spec/task completely:
-- Follow the spec's requirements exactly
-- Write clean, maintainable code
-- Add tests as needed
+1. `STATE 1` prompt for domain
+2. `STATE 2` validate spec
+3. `STATE 3` generate matrices
+4. `STATE 4` plan tasks
+5. `STATE 5` execute one task
+6. `STATE 6` run safety gate validation
+7. `STATE 7` commit
+8. `STATE 8` stopped on failure
 
----
-
-## Phase 3: Validate
-
-Run the project's test suite and verify:
-- All tests pass
-- No lint errors
-- The spec's acceptance criteria are 100% met
-
----
-
-## Phase 4: Commit & Update
-
-1. Mark the spec/task as complete (add `## Status: COMPLETE` to spec file)
-2. `git add -A`
-3. `git commit` with a descriptive message
-4. `git push`
-
----
+One task.
+One commit.
+Keep diffs small.
+Never continue past uncertainty.
 
 ## Completion Signal
 
-**CRITICAL:** Only output the magic phrase when the work is 100% complete.
-
-Check:
-- [ ] Implementation matches all requirements
-- [ ] All tests pass
-- [ ] All acceptance criteria verified
-- [ ] Changes committed and pushed
-- [ ] Spec marked as complete
-
-**If ALL checks pass, output:** `<promise>DONE</promise>`
-
-**If ANY check fails:** Fix the issue and try again. Do NOT output the magic phrase.
+Only output `<promise>DONE</promise>` when one task is completed, safety gates pass, commit succeeded, and no unresolved prerequisite exists.
 BUILDEOF
 
 # Create planning prompt (only used if plan mode is explicitly requested)

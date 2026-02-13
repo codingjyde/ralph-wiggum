@@ -1,107 +1,302 @@
-# Ralph Build Mode
+# Ralph Build Mode (Deterministic)
 
-Based on Geoffrey Huntley's Ralph Wiggum methodology.
+You are building a deterministic, enterprise-grade Spec-Driven Autonomous Loop.
 
----
+No improvisation.
+No stack drift.
+No speculative scaffolding.
+No implicit assumptions.
+Stop until it is done.
 
-## Phase 0: Orient
+## State Machine Model (Mandatory)
 
-0a. Read `.specify/memory/constitution.md` for project principles (if exists).
+Execution states:
 
-0b. Study `specs/` folder to understand all feature specifications.
+1. `STATE 1: DOMAIN_REQUIRED`
+2. `STATE 2: SPEC_VALIDATION`
+3. `STATE 3: MATRIX_GENERATION`
+4. `STATE 4: TASK_PLANNING`
+5. `STATE 5: TASK_EXECUTION`
+6. `STATE 6: SAFETY_GATE_VALIDATION`
+7. `STATE 7: COMMIT`
+8. `STATE 8: STOPPED`
 
----
+Transitions are strictly linear.
 
-## Phase 1: Select Work Item
+If any state fails:
+- Insert prerequisite task.
+- Commit only prerequisite task.
+- Stop all execution.
+- Enter `STATE 8: STOPPED`.
 
-**DEFAULT: Work directly from specs (no plan needed)**
+Never continue past uncertainty.
 
-Look at the `specs/` folder and find specs that are NOT yet complete.
+## Mandatory Domain Input
 
-A spec is incomplete if:
-- It has unchecked acceptance criteria `- [ ]`
-- It does NOT have `## Status: COMPLETE` at the top
-- The codebase doesn't fully implement its requirements
+Before scaffolding:
+- Prompt for real root domain.
+- Prompt for required subdomains.
+- Do not use `example.com`.
+- Do not proceed without explicit confirmation.
 
-Pick the **HIGHEST PRIORITY** incomplete spec:
-- Lower spec numbers = higher priority (001 before 010)
-- Or follow any priority hints in the spec itself
-- **Exception:** If the highest priority spec seems unachievable or needs another spec as a precondition, choose that dependency instead
+If missing:
+- Insert prerequisite.
+- Commit it.
+- Stop until it is done.
 
-**OPTIONAL: If IMPLEMENTATION_PLAN.md exists AND has tasks**
-You may use it to pick the next task. But this is optional — most projects just use specs directly.
+## Prerequisite Enforcement (Non-Negotiable)
 
-Before implementing, search the codebase — don't assume the work isn't already done.
+If a missing prerequisite is discovered:
+1. Insert a new task directly above the current task.
+2. Mark it as `PREREQUISITE`.
+3. Commit only that prerequisite.
+4. Stop all execution.
+5. Do not resume original task until prerequisite is complete.
 
----
+## Root Structure Rule
 
-## Phase 1b: Track Attempts (NR_OF_TRIES)
+Target product repository root must contain only:
+- `./docs`
+- `./code`
 
-After selecting a spec:
+All specs and documentation -> `./docs`
+All implementation -> `./code`
 
-1. Look for `NR_OF_TRIES: N` at the bottom of the spec file
-2. If found, increment N; if not found, add `NR_OF_TRIES: 1` at the very bottom
-3. If NR_OF_TRIES > 0, check the `history/` folder for notes about previous attempts on this spec
-4. **If NR_OF_TRIES = 10:** This spec is unachievable (too hard or too big). Split it into simpler specs and mark the original as superseded
+If violated:
+- Insert prerequisite.
+- Commit it.
+- Stop until it is done.
 
-This prevents the loop from getting stuck forever on one difficult spec.
+## Date Storage Rule
 
----
+All persisted dates must be epoch milliseconds (`Date.now()`).
 
-## Phase 2: Implement
+Do not store:
+- ISO strings
+- Date objects
+- Formatted date strings
 
-Implement the selected spec completely:
-- Follow the spec's requirements exactly
-- Write clean, maintainable code
-- Add tests as needed
-- Handle edge cases mentioned in the spec
+Violation fails safety gate.
 
----
+## File and Formatting Rules
 
-## Phase 3: Validate
+- Folder-based modules only (`./contact/index.js`, not `./contact.js`)
+- 4 spaces indentation for `.js` and `.vue`
+- No 2-space indentation
+- No mixed tabs/spaces
 
-Run the project's test suite and verify:
-- All existing tests still pass
-- New functionality works as specified
-- The spec's acceptance criteria are 100% met
+Violation fails safety gate.
 
----
+## Common Code and Constants
 
-## Phase 4: Record History
+Shared code path: `./src/_common`
 
-Add concise notes to `history/` folder (create if needed):
-- What was learned during this implementation
-- Any gotchas or issues encountered
-- Decisions made and why
+Constants path: `./src/_common/constants`
 
-Keep notes brief — they help future iterations understand context.
+Constants rules:
+- Object.freeze enums
+- Folder-based modules with `index.js`
+- Never redefined
+- Never mutated
 
----
+Mode enum must exist at `./src/_common/constants/mode/index.js`:
 
-## Phase 5: Commit & Mark Complete
+```js
+const Mode = Object.freeze({
+    ALL: 0,
+    WEB: 1,
+    REALTIME: 2,
+    WORKER: 3
+});
 
-1. Add `## Status: COMPLETE` to the top of the spec file
-2. Check off all acceptance criteria in the spec: `- [x]`
-3. `git add -A`
-4. `git commit` with a descriptive message referencing the spec
-5. `git push`
-6. If this triggered a deploy (or deploy is needed), watch the deploy until successful — fix and re-commit/push/deploy as needed
+module.exports = {
+    Mode: Mode
+};
+```
 
----
+If missing:
+- Insert prerequisite.
+- Commit it.
+- Stop until it is done.
 
-## Phase 6: Completion Signal
+## Runtime Mode System
 
-**CRITICAL:** Only output the magic phrase when the spec is 100% complete.
+Server must not start all services unconditionally.
 
-Check:
-- [ ] All requirements from the spec are implemented
-- [ ] All acceptance criteria pass
-- [ ] All tests pass
-- [ ] Changes committed and pushed
-- [ ] Spec marked as COMPLETE
-- [ ] History notes recorded
-- [ ] Deploy successful (if applicable)
+`MODE` is read from environment. Default: `Mode.ALL`.
 
-**If ALL checks pass, output:** `<promise>DONE</promise>`
+Service startup matrix:
+- `ALL`: WEB + REALTIME + WORKER
+- `WEB`: Express only
+- `REALTIME`: socket.io only
+- `WORKER`: agenda only
 
-**If ANY check fails:** Fix the issue and try again. Do NOT output the magic phrase.
+Mode import path: `./src/_common/constants/mode`
+
+Unconditional startup fails safety gate.
+
+## Backend Technology Lock
+
+- Web: Express.js + CommonJS + async/await
+- Realtime: socket.io
+- Telephony: FreeSWITCH only
+- Jobs: agenda.js
+- Database: MongoDB + Mongoose
+- Logging: winston only, structured JSON
+- No `console.log` outside tests
+- Process manager: pm2 only if required
+
+Deviation:
+- Insert prerequisite.
+- Commit it.
+- Stop until it is done.
+
+## Logging Standard
+
+- winston only
+- JSON output
+- required fields: timestamp, level, service, environment
+- no secrets in logs
+- centralized logger module only
+- no inline logger configuration
+
+Violation fails safety gate.
+
+## Mongoose Model Rules
+
+Every model must:
+1. Use string `_id`
+2. Disable auto `_id` and set `_id` default to `new ObjectId().toString()`
+3. Store `createdAt` and `updatedAt` as epoch milliseconds
+4. Include `isDeleted`
+5. Declare `scopeMode`: `organisation` or `host`
+
+If `scopeMode = organisation`, all queries must include `organisationId`.
+
+Missing enforcement fails safety gate.
+
+## Soft Delete
+
+All applicable queries must enforce:
+
+`{ isDeleted: false }`
+
+Missing enforcement fails safety gate.
+
+## Pagination (Mandatory)
+
+All list endpoints must support:
+1. `cursor + size`
+2. `page + size`
+
+Rules:
+- default size = 25
+- max size = 100
+- stable sorting required
+- cursor mode wins if both provided
+
+Missing support fails safety gate.
+
+## Client Stack Rules
+
+Web:
+- Quasar
+- Vue 3
+- Vuex
+- Options API
+- History mode router
+- Netlify deployment
+
+Netlify SPA fallback required at `public/_redirects`:
+
+`/* /index.html 200`
+
+Mobile: NativeScript only, if explicitly required by spec.
+
+Do not use:
+- React
+- Composition API
+- Pinia
+- TypeScript unless explicitly required
+
+## Vue Component Order (Strict)
+
+```js
+export default {
+    name: '',
+    data: function () { return {}; },
+    computed: {},
+    watch: {},
+    created: function () {},
+    mounted: function () {},
+    methods: {},
+    components: {},
+    props: {}
+};
+```
+
+Incorrect order fails safety gate.
+
+## Spec System
+
+Specs must live in `./docs/specs`.
+
+Every spec must include:
+- version
+- objectives
+- constraints
+- contracts
+- events
+- acceptance tests
+- Service Matrix
+- Client Matrix
+- Technology Matrix
+
+No implementation before spec validation (`STATE 2`).
+
+## Safety Gates (Before Commit)
+
+Abort commit if any fail:
+- Diff too large
+- `console.log` outside tests
+- Spec changed without version bump
+- Tests not executed
+- Secrets in logs
+- organisation-scoped query missing `organisationId`
+- `isDeleted` enforcement missing
+- `_id` not string
+- Dates not epoch milliseconds
+- Pagination missing both strategies
+- Mode not imported from `_common/constants`
+- Services start unconditionally
+- Incorrect indentation
+- Missing Quasar `_redirects`
+- Router not history mode
+- Vue component order incorrect
+- Constant enum defined outside `_common/constants`
+
+If any safety gate fails: abort commit and enter `STATE 8: STOPPED`.
+
+## Execution Flow
+
+1. `STATE 1` -> Prompt for domain
+2. `STATE 2` -> Validate spec
+3. `STATE 3` -> Generate matrices
+4. `STATE 4` -> Plan tasks
+5. `STATE 5` -> Execute one task
+6. `STATE 6` -> Run safety gates
+7. `STATE 7` -> Commit
+8. `STATE 8` -> STOPPED on failure
+
+One task.
+One commit.
+Small diff.
+No continuation past uncertainty.
+
+## Completion Signal
+
+Only output `<promise>DONE</promise>` when:
+- One task has been completed
+- Safety gate passed
+- Commit completed
+- No unresolved prerequisite exists

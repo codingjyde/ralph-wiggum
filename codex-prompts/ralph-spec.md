@@ -13,40 +13,47 @@ You are implementing a single specification for this project.
 
 Read the spec from: `specs/$ARGUMENTS/spec.md`
 
-## Before You Start
+## Deterministic Contract
 
-Read these files first:
-1. `RALPH_PROMPT.md` - Master instructions
-2. `.specify/memory/constitution.md` - Core principles
-3. `AGENTS.md` - Development guidelines
-4. `history.md` - See what's been done already (if present)
+Use this strict state machine and never skip states:
+1. `STATE 1: DOMAIN_REQUIRED`
+2. `STATE 2: SPEC_VALIDATION`
+3. `STATE 3: MATRIX_GENERATION`
+4. `STATE 4: TASK_PLANNING`
+5. `STATE 5: TASK_EXECUTION`
+6. `STATE 6: SAFETY_GATE_VALIDATION`
+7. `STATE 7: COMMIT`
+8. `STATE 8: STOPPED`
 
-## Your Process
+Mandatory domain gate before scaffolding:
+- prompt for real root domain
+- prompt for required subdomains
+- never use `example.com`
+- stop if not confirmed
 
-1. **Read the spec file** thoroughly
-2. **Understand acceptance criteria** in the Completion Signal section
-3. **Implement the feature** step by step
-4. **Run tests** as specified in the Completion Signal
-5. **Fix any issues** that arise
-6. **Commit and push** with meaningful messages
-7. **Update history** if required
+If any prerequisite is missing:
+1. Insert a prerequisite task directly above the current task
+2. Mark it `PREREQUISITE`
+3. Commit only that prerequisite
+4. Stop and enter `STATE 8`
 
-## Autonomy Rules
+Safety gates before commit are mandatory. Fail/stop on:
+- tests not executed
+- diff too large
+- `console.log` outside tests
+- non-epoch date persistence
+- missing `organisationId` in organisation-scoped queries
+- missing `{ isDeleted: false }` enforcement
+- `_id` not string in mongoose models
+- missing dual pagination (`cursor+size` and `page+size`)
+- wrong mode import path (`./src/_common/constants/mode`)
+- unconditional service startup
+- wrong indentation for `.js`/`.vue` (must be 4 spaces)
+- missing Quasar `public/_redirects` or non-history router
+- Vue component block order violation
+- constants outside `./src/_common/constants`
 
-- You have FULL autonomy - commit, push, deploy without asking
-- Use hosting tools to deploy if required
-- Use browser tools to visually verify UI when relevant
-- Test everything before marking complete
-
-## Iteration
-
-If tests fail or acceptance criteria aren't met:
-1. Analyze the failure
-2. Fix the issue
-3. Re-run tests
-4. Repeat until passing
-
-Maximum iterations: 30 (or as specified in arguments)
+Run one task only. Commit once. Keep diff small.
 
 ## Completion Signal
 

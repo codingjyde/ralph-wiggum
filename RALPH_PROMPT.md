@@ -4,6 +4,18 @@
 
 Implement all specifications in the `specs/` folder, one by one, until each spec's acceptance criteria and testing requirements pass. Work autonomously - commit, push, deploy, test, iterate.
 
+Use a strict linear state machine for every task:
+1. `DOMAIN_REQUIRED`
+2. `SPEC_VALIDATION`
+3. `MATRIX_GENERATION`
+4. `TASK_PLANNING`
+5. `TASK_EXECUTION`
+6. `SAFETY_GATE_VALIDATION`
+7. `COMMIT`
+8. `STOPPED`
+
+No improvisation. No stack drift. No continuation past uncertainty.
+
 ## Context Files (Read First)
 
 1. `.specify/memory/constitution.md` - Core principles and constraints
