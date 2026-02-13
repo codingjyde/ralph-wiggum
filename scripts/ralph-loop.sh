@@ -378,7 +378,8 @@ If missing:
 
 ## Mandatory Rules
 
-- Target app root must contain only `./docs` and `./code`
+- Do NOT restructure this Ralph runner repository. It may contain scripts/, templates/, codex-prompts/, skills/, etc.
+- In the TARGET SOLUTION REPOSITORY (the app being built), the repository root must contain only `./docs` and `./code`
 - Specs live in `./docs/specs` with: version, objectives, constraints, contracts, events, acceptance tests, Service Matrix, Client Matrix, Technology Matrix
 - Persisted dates must be epoch milliseconds via `Date.now()`
 - Folder-based modules only; 4 spaces in `.js` and `.vue`
